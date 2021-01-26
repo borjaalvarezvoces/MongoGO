@@ -1,0 +1,118 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+<HorizontalScrollView
+    android:id="@+id/horizontalGallery"
+    android:layout_width="match_parent"
+    android:layout_height="392dp"
+    android:background="#74BDBC"
+    android:scrollbars="none">
+    <LinearLayout
+        android:id="@+id/imageLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="392dp"
+            android:layout_weight="1"
+            android:background="@color/colorMagenta"
+            android:contentDescription="TODO" />
+
+    </LinearLayout>
+</HorizontalScrollView>
+
+
+    <Button
+        android:id="@+id/button_capture"
+        android:drawableStart="@drawable/ic_add_photo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="26dp"
+        android:textSize="24dp"
+        />
+
+    <TableLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/dateDetail"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/dateDetailTxt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/dateDetail"
+                android:imeOptions="flagNoExtractUi"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/streetDetail"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:hint="@string/streetDetail"
+                android:layout_height="wrap_content"
+                android:id="@+id/streetDetailTxt"
+                android:imeOptions="flagNoExtractUi"/>
+        </TableRow>
+
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/descriptionDetail"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/descriptionDetailTxt"
+                android:layout_width="0dp"
+                android:layout_height="70dp"
+                android:layout_weight="3"
+                android:hint="@string/descriptionDetail"
+                android:imeActionLabel="@string/delete_marker_n2"
+                android:imeOptions="actionSend|flagNoExtractUi"
+                android:maxLength="20"
+                android:singleLine="true" />
+        </TableRow>
+
+    </TableLayout>
+
+</LinearLayout>

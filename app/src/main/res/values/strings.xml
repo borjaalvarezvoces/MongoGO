@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MongoGO</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="delete_marker_n2">Delete Marker N2</string>
+    <string name="marker_title">Marker Title</string>
+    <string name="dateDetail">Fecha</string>
+    <string name="streetDetail">Calle</string>
+    <string name="descriptionDetail">Descripcion</string>
+</resources>
