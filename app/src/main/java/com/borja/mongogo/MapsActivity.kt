@@ -121,7 +121,6 @@ class MapsActivity : AppCompatActivity(),
     ) {
         if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // comentario para probar a subirlo a la nueva rama "multiImage"
                 getUserLocation()
             } else {
                 Toast.makeText(this, "Permission was not granted", Toast.LENGTH_SHORT).show()
