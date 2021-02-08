@@ -40,7 +40,7 @@ class MapsActivity : AppCompatActivity(),
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1000
-    val permissions = arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION)
+    val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,8 +80,7 @@ class MapsActivity : AppCompatActivity(),
     private fun hasNoPermissions(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION
+                this, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         } else {
             return true
@@ -122,7 +121,8 @@ class MapsActivity : AppCompatActivity(),
     ) {
         if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getUserLocation();
+                // comentario de prueba
+                getUserLocation()
             } else {
                 Toast.makeText(this, "Permission was not granted", Toast.LENGTH_SHORT).show()
             }
