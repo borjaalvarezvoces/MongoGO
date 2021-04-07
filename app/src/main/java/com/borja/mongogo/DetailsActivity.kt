@@ -28,7 +28,7 @@ import java.util.*
 
 class DetailsActivity : AppCompatActivity(), Serializable {
 
-
+// prueba para ver si consigo subir solamente algo a la rama multimagen
     private lateinit var markerTxtId: TextView
     private lateinit var dateToTxt: TextView
 
