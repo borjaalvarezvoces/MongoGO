@@ -29,6 +29,7 @@ import java.util.*
 class DetailsActivity : AppCompatActivity(), Serializable {
 
 
+    //prueba 4328794032843290
     private lateinit var markerTxtId: TextView
     private lateinit var dateToTxt: TextView
 
@@ -120,12 +121,12 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         }
     }
 
-   private fun  displayArrayOfViews(){
-        for (i in 1.. arrayImageViews.size){
+    private fun displayArrayOfViews() {
+        for (i in 1..arrayImageViews.size) {
             val newView = ImageView(this)
             newView.setImageURI(image_uri)
             imageLayout.addView(newView)
         }
-   }
+    }
 }
 
