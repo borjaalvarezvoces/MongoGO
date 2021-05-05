@@ -4,18 +4,17 @@ import android.app.Activity
 import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_details.*
@@ -26,7 +25,7 @@ import java.util.*
 
 class DetailsActivity : AppCompatActivity(), Serializable {
 
-    private lateinit var markerTxtId: TextView
+    // private lateinit var markerTxtId: TextView
     private lateinit var dateToTxt: TextView
 
     val permissions = arrayOf(
@@ -35,7 +34,6 @@ class DetailsActivity : AppCompatActivity(), Serializable {
     )
     private val PERMISSIONS_REQUEST_ACCESS_CAMERA_AND_WSTORAGE = 1001
     private val IMAGE_CAPTURE_CODE = 1002
-
 
     val arrayImageViews: MutableList<Uri> = mutableListOf()
     var image_uri: Uri? = null
@@ -46,15 +44,24 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         setContentView(R.layout.activity_details)
 
         dateForMarker()
+        /*
+            markerTxtId = findViewById(R.id.descriptionDetailTxt)
+            val markerIdDetail = intent.getSerializableExtra("Id")
+            markerTxtId.text = markerIdDetail.toString()
 
-        markerTxtId = findViewById(R.id.descriptionDetailTxt)
-        val markerIdDetail = intent.getSerializableExtra("Id")
-        markerTxtId.text = markerIdDetail.toString()
 
+         */
         button_capture.setOnClickListener {
             takePhoto()
         }
+
+        button_del_photos.setOnClickListener {
+            delPhotos()
+        }
+
+
     }
+
 
     private fun dateForMarker() {
         val calendar = Calendar.getInstance()
@@ -120,8 +127,8 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, image_uri)
         startActivityForResult(cameraIntent, IMAGE_CAPTURE_CODE)
-    }
 
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -129,11 +136,13 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         if (resultCode == Activity.RESULT_OK) {
             image_uri?.let { arrayImageViews.add(it) }
             displayRecycleManager()
+
+            button_del_photos.visibility = View.VISIBLE
         }
     }
 
     private fun displayRecycleManager() {
-        val listArrayImageView: MutableList<Movie> = mutableListOf()
+        val listArrayImageView: MutableList<Photo> = mutableListOf()
         val recycler = findViewById<RecyclerView>(R.id.recycler_id)
         val layoutManager = LinearLayoutManager(
             this,
@@ -141,10 +150,17 @@ class DetailsActivity : AppCompatActivity(), Serializable {
             false
         )
         recycler.layoutManager = layoutManager
-
         for (i in arrayImageViews.indices) {
-            listArrayImageView.add(i, (Movie("Movie 2 ", arrayImageViews[i])))
+            listArrayImageView.add(i, (Photo("Foto:${i + 1}", arrayImageViews[i])))
         }
-        recycler.adapter = MovieAdapter(listArrayImageView)
+        recycler.adapter = PhotoAdapter(listArrayImageView)
+
+    }
+
+
+    private fun delPhotos() {
+        arrayImageViews.clear()
+        displayRecycleManager()
+        button_del_photos.visibility = View.GONE
     }
 }

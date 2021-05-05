@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayoutPhotoView_id"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:parentTag="LinearLayout">
 
     <com.borja.mongogo.AspectRatioImageView
         android:id="@+id/cover_id"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:scaleType="centerCrop"
-        app:ratio="1.5"
-        app:srcCompat="@drawable/llama" />
+        android:layout_height="wrap_content"
+        android:background="@color/colorBlack"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/title_id"
@@ -23,5 +22,6 @@
         android:padding="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textColor="@android:color/background_light"
-        tools:text="Llama" />
+        tools:text="PhotoTitle" />
+
 </LinearLayout>

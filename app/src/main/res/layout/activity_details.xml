@@ -1,99 +1,118 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".DetailsActivity"
+    tools:ignore="MergeRootFrame">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_id"
+
+    <ScrollView
+        android:id="@+id/scroll"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
-        tools:listitem="@layout/view_movie" />
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".DetailsActivity"
+        tools:ignore="MergeRootFrame">
 
-    <Button
-        android:id="@+id/button_capture"
-        android:drawableStart="@drawable/ic_add_photo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:padding="26dp"
-        android:textSize="24dp" />
+        <LinearLayout
 
-    <TableLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-        <TableRow
+            android:id="@+id/LinearLayoutDA_id"
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="0dp"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler_id"
+                android:layout_width="match_parent"
+                android:layout_height="500dp"
+                tools:listitem="@layout/view_photo" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_capture"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/dateDetail"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                android:layout_gravity="center"
+                android:layout_margin="16dp"
+                app:layout_anchor="@+id/item_detail_container"
+                app:layout_anchorGravity="top|end"
+                app:srcCompat="@android:drawable/ic_menu_camera" />
 
-            <TextView
-                android:id="@+id/dateDetailTxt"
-                android:layout_width="0dp"
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/button_del_photos"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:hint="@string/dateDetail"
-                android:imeOptions="flagNoExtractUi"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-        </TableRow>
+                android:layout_gravity="top|end"
+                android:layout_margin="16dp"
+                android:visibility="visible"
+                app:srcCompat="@drawable/ic_delete_photo" />
 
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/streetDetail"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="10dp">
 
-            <EditText
-                android:layout_width="0dp"
-                android:layout_weight="3"
-                android:hint="@string/streetDetail"
-                android:layout_height="wrap_content"
-                android:id="@+id/streetDetailTxt"
-                android:imeOptions="flagNoExtractUi"/>
-        </TableRow>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|start"
+                    android:text="@string/dateDetail"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-        <TableRow
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/dateDetailTxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|start"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:text="@string/descriptionDetail"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="24sp"
-                android:textStyle="bold" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|start"
+                    android:text="@string/streetDetail"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-            <EditText
-                android:id="@+id/descriptionDetailTxt"
-                android:layout_width="0dp"
-                android:layout_height="70dp"
-                android:layout_weight="3"
-                android:hint="@string/descriptionDetail"
-                android:imeActionLabel="@string/delete_marker_n2"
-                android:imeOptions="actionSend|flagNoExtractUi"
-                android:maxLength="20"
-                android:singleLine="true" />
-        </TableRow>
+                <EditText
+                    android:id="@+id/streetDetailTxt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|start"
+                    android:hint="@string/streetDetail" />
 
-    </TableLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|start"
+                    android:text="@string/descriptionDetail"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
 
-</LinearLayout>
+                <androidx.core.widget.NestedScrollView
+                    android:id="@+id/frameLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                    <EditText
+                        android:id="@+id/descriptionDetailTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="16dp"
+                        android:text="@string/large_text" />
+                </androidx.core.widget.NestedScrollView>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
