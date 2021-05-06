@@ -1,7 +1,9 @@
 package com.borja.mongogo
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ContentValues
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -56,7 +58,8 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         }
 
         button_del_photos.setOnClickListener {
-            delPhotos()
+            delPhotosConfirmation()
+
         }
 
 
@@ -157,10 +160,21 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     }
 
+    private fun delPhotosConfirmation() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Atención!")
+        builder.setMessage("Estás seguro de querer borrar todas las fotos?")
+        builder.setPositiveButton("Si") { dialogInterface: DialogInterface, i: Int ->
+            delPhotos()
+        }
+        builder.setNegativeButton("No") { dialogInterface: DialogInterface, i: Int -> }
+        builder.show()
+    }
 
     private fun delPhotos() {
         arrayImageViews.clear()
         displayRecycleManager()
         button_del_photos.visibility = View.GONE
     }
+
 }
