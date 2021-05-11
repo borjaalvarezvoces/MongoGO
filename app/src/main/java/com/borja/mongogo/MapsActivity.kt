@@ -22,10 +22,13 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_maps.*
 
 import java.util.*
 
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class MapsActivity : AppCompatActivity(),
     OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener,
@@ -43,6 +46,8 @@ class MapsActivity : AppCompatActivity(),
     val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
 
+    private val db = FirebaseFirestore.getInstance()
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -53,6 +58,9 @@ class MapsActivity : AppCompatActivity(),
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        saveMarkerButton()
+        loadMarkerButton()
+
     }
 
 
@@ -63,7 +71,7 @@ class MapsActivity : AppCompatActivity(),
         getDeviceLocation()
 
         setMapLongClick(map)
-        deleteMarkerButton()
+        saveMarkerButton()
         // map.setOnInfoWindowClickListener(this)
         map.setOnInfoWindowLongClickListener(this)
         map.setOnMarkerClickListener(this)
@@ -114,6 +122,7 @@ class MapsActivity : AppCompatActivity(),
             }
         }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -149,19 +158,44 @@ class MapsActivity : AppCompatActivity(),
             pointMarker.tag = 0
             map.animateCamera(CameraUpdateFactory.newLatLng(pointMarker.position))
             arrayOfMarkers.add(pointMarker)
-            println(pointMarker.id)
-            println(arrayOfMarkers)
         }
     }
 
-    private fun deleteMarkerButton() {
-        val btnDeleteMarker = findViewById<Button>(R.id.btn_delete_marker)
-        btnDeleteMarker.setOnClickListener {
-            println(arrayOfMarkers)
-            arrayOfMarkers.removeAt(1).remove()
-            println(arrayOfMarkers)
+    private fun saveMarkerButton() {
+        btn_save_marker.setOnClickListener {
+            Toast.makeText(this, "Boton pulsado", Toast.LENGTH_SHORT).show()
+
+            for (i in arrayOfMarkers.indices) {
+                db.collection("markersGeo").document(arrayOfMarkers[i].id).set(
+                    hashMapOf(
+                        "id" to arrayOfMarkers[i].id,
+                        "title" to arrayOfMarkers[i].title,
+                        "latitude" to arrayOfMarkers[i].position.latitude,
+                        "longitude" to arrayOfMarkers[i].position.longitude
+                    )
+                )
+            }
         }
     }
+
+    private fun loadMarkerButton() {
+        btn_load_marker.setOnClickListener {
+            Toast.makeText(this, "Boton trtretretrpulsado", Toast.LENGTH_SHORT).show()
+            db.collection("markersGeo").get().addOnSuccessListener {
+                for (marker in it) {
+                    var markerPoint = marker.toObject(MapMarker::class.java)
+                    Log.i("nosgyutyurytte", markerPoint.toString())
+                    map?.addMarker(
+                        MarkerOptions()
+                            .title(markerPoint.id)
+                            .position(LatLng(markerPoint.latitude, markerPoint.longitude))
+
+                    )
+                }
+            }
+        }
+    }
+
 
     override fun onInfoWindowLongClick(marker: Marker?) {
         println(marker?.id)
