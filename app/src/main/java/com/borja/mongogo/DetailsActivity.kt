@@ -31,6 +31,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     private val db = FirebaseFirestore.getInstance()
 
+    //prueba 4328794032843290
     private lateinit var markerTxtId: TextView
     private lateinit var dateToTxt: TextView
 
@@ -166,7 +167,8 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         recycler.adapter = PhotoAdapter(listArrayImageView)
 
     }
-
+  
+  multiImagen
     private fun delPhotosConfirmation() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Atención!")
@@ -190,5 +192,6 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     }
     */
+
 
 }
