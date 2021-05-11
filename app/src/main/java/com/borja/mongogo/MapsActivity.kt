@@ -18,14 +18,9 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import android.widget.Button
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_maps.*
-
-import java.util.*
 
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
@@ -36,8 +31,9 @@ class MapsActivity : AppCompatActivity(),
 
     private var map: GoogleMap? = null
 
+    //AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
     private lateinit var pointMarker: Marker
-    private val arrayOfMarkers = arrayListOf<Marker>()
+    //  private val arrayOfMarkers = arrayListOf<Marker>()
 
     private var lastKnownLocation: Location? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -58,8 +54,8 @@ class MapsActivity : AppCompatActivity(),
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        saveMarkerButton()
-        loadMarkerButton()
+        //  saveMarkerButton()
+        updateMarkersDB()
 
     }
 
@@ -71,7 +67,7 @@ class MapsActivity : AppCompatActivity(),
         getDeviceLocation()
 
         setMapLongClick(map)
-        saveMarkerButton()
+        //  saveMarkerButton()
         // map.setOnInfoWindowClickListener(this)
         map.setOnInfoWindowLongClickListener(this)
         map.setOnMarkerClickListener(this)
@@ -130,7 +126,7 @@ class MapsActivity : AppCompatActivity(),
     ) {
         if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //comentario prueba antes del clone
+                // comentario para probar a subirlo a la nueva rama "multiImage"
                 getUserLocation()
             } else {
                 Toast.makeText(this, "Permission was not granted", Toast.LENGTH_SHORT).show()
@@ -142,64 +138,70 @@ class MapsActivity : AppCompatActivity(),
 
     private fun setMapLongClick(map: GoogleMap) {
         map.setOnMapLongClickListener { latLng ->
-            val snippet = String.format(
+/*            val snippet = String.format(
                 Locale.getDefault(),
                 "Lat: %1$.3f, Long: %2$.3f",
                 latLng.latitude,
                 latLng.longitude
-            )
+            )*/
             pointMarker = map.addMarker(
                 MarkerOptions()
                     .position(latLng)
                     .title(getString(R.string.marker_title))
-                    .draggable(true)
-                    .snippet(snippet)
+                //.snippet()
             )
+            pointMarker.title = pointMarker.id
             pointMarker.tag = 0
             map.animateCamera(CameraUpdateFactory.newLatLng(pointMarker.position))
-            arrayOfMarkers.add(pointMarker)
+            //  arrayOfMarkers.add(pointMarker)
+
+            db.collection("markersGeo").document(pointMarker.id).set(
+                hashMapOf(
+                    "id" to pointMarker.id,
+                    "title" to pointMarker.title,
+                    "latitude" to pointMarker.position.latitude,
+                    "longitude" to pointMarker.position.longitude
+                )
+            )
         }
     }
 
-    private fun saveMarkerButton() {
-        btn_save_marker.setOnClickListener {
-            Toast.makeText(this, "Boton pulsado", Toast.LENGTH_SHORT).show()
+    /*   private fun saveMarkerButton() {
+           btn_save_marker.setOnClickListener {
+               Toast.makeText(this, "Boton pulsado", Toast.LENGTH_SHORT).show()
 
-            for (i in arrayOfMarkers.indices) {
-                db.collection("markersGeo").document(arrayOfMarkers[i].id).set(
-                    hashMapOf(
-                        "id" to arrayOfMarkers[i].id,
-                        "title" to arrayOfMarkers[i].title,
-                        "latitude" to arrayOfMarkers[i].position.latitude,
-                        "longitude" to arrayOfMarkers[i].position.longitude
-                    )
+               for (i in arrayOfMarkers.indices) {
+                   db.collection("markersGeo").document(arrayOfMarkers[i].id).set(
+                       hashMapOf(
+                           "id" to arrayOfMarkers[i].id,
+                           "title" to arrayOfMarkers[i].title,
+                           "latitude" to arrayOfMarkers[i].position.latitude,
+                           "longitude" to arrayOfMarkers[i].position.longitude
+                       )
+                   )
+               }
+           }
+       }*/
+
+    private fun updateMarkersDB() {
+        db.collection("markersGeo").get().addOnSuccessListener {
+            for (marker in it) {
+                var markerPoint = marker.toObject(MapMarker::class.java)
+                Log.i("nosgyutyurytte", markerPoint.toString())
+                map?.addMarker(
+                    MarkerOptions()
+                        .title(markerPoint.id)
+                        .position(LatLng(markerPoint.latitude, markerPoint.longitude))
+
                 )
             }
         }
+
     }
-
-    private fun loadMarkerButton() {
-        btn_load_marker.setOnClickListener {
-            Toast.makeText(this, "Boton trtretretrpulsado", Toast.LENGTH_SHORT).show()
-            db.collection("markersGeo").get().addOnSuccessListener {
-                for (marker in it) {
-                    var markerPoint = marker.toObject(MapMarker::class.java)
-                    Log.i("nosgyutyurytte", markerPoint.toString())
-                    map?.addMarker(
-                        MarkerOptions()
-                            .title(markerPoint.id)
-                            .position(LatLng(markerPoint.latitude, markerPoint.longitude))
-
-                    )
-                }
-            }
-        }
-    }
-
 
     override fun onInfoWindowLongClick(marker: Marker?) {
         println(marker?.id)
-        println(pointMarker.id)
+        println("estamos en onInfoWindowLongClick por debajo del id de marker")
 
         val markerId = marker?.id
         val intentMarker = Intent(this, DetailsActivity::class.java)

@@ -30,9 +30,9 @@ import java.util.*
 class DetailsActivity : AppCompatActivity(), Serializable {
 
     private val db = FirebaseFirestore.getInstance()
-
-    //prueba 4328794032843290
-    private lateinit var markerTxtId: TextView
+//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+private lateinit var markerTxtId: TextView
+    private lateinit var markerTxtLtLng: TextView
     private lateinit var dateToTxt: TextView
 
     val permissions = arrayOf(
@@ -51,9 +51,10 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         setContentView(R.layout.activity_details)
 
         dateForMarker()
-
+        markerTxtLtLng = findViewById(R.id.markerTxtLtLng)
         markerTxtId = findViewById(R.id.streetDetailTxt)
         val markerIdDetail = intent.getSerializableExtra("Id")
+
         markerTxtId.text = markerIdDetail.toString()
         println("markereeeeeeeeeeee $markerIdDetail")
         println("markereeeeeeeeeeee $markerTxtId")
@@ -61,18 +62,14 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         button_capture.setOnClickListener {
             takePhoto()
         }
-
         button_del_photos.setOnClickListener {
             delPhotosConfirmation()
-
         }
         buttonSave_id.setOnClickListener {
             //  guardarMarkerDetail()
         }
 
-
     }
-
 
     private fun dateForMarker() {
         val calendar = Calendar.getInstance()
@@ -167,8 +164,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         recycler.adapter = PhotoAdapter(listArrayImageView)
 
     }
-  
-  multiImagen
+
     private fun delPhotosConfirmation() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Atención!")
@@ -192,6 +188,5 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     }
     */
-
 
 }

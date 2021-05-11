@@ -102,6 +102,13 @@
                     android:gravity="center|start"
                     android:hint="@string/streetDetail" />
 
+                <EditText
+                    android:id="@+id/markerTxtLtLng"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center|start"
+                    android:hint="@string/streetDetail" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
