@@ -19,6 +19,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_details.*
 import java.io.Serializable
 import java.text.DateFormat
@@ -27,7 +29,9 @@ import java.util.*
 
 class DetailsActivity : AppCompatActivity(), Serializable {
 
-    // private lateinit var markerTxtId: TextView
+    private val db = FirebaseFirestore.getInstance()
+
+    private lateinit var markerTxtId: TextView
     private lateinit var dateToTxt: TextView
 
     val permissions = arrayOf(
@@ -46,13 +50,13 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         setContentView(R.layout.activity_details)
 
         dateForMarker()
-        /*
-            markerTxtId = findViewById(R.id.descriptionDetailTxt)
-            val markerIdDetail = intent.getSerializableExtra("Id")
-            markerTxtId.text = markerIdDetail.toString()
 
+        markerTxtId = findViewById(R.id.streetDetailTxt)
+        val markerIdDetail = intent.getSerializableExtra("Id")
+        markerTxtId.text = markerIdDetail.toString()
+        println("markereeeeeeeeeeee $markerIdDetail")
+        println("markereeeeeeeeeeee $markerTxtId")
 
-         */
         button_capture.setOnClickListener {
             takePhoto()
         }
@@ -60,6 +64,9 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         button_del_photos.setOnClickListener {
             delPhotosConfirmation()
 
+        }
+        buttonSave_id.setOnClickListener {
+            //  guardarMarkerDetail()
         }
 
 
@@ -176,5 +183,12 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         displayRecycleManager()
         button_del_photos.visibility = View.GONE
     }
+
+    /*
+    private fun guardarMarkerDetail(){
+        db.collection("descripcionPrueba").document()
+
+    }
+    */
 
 }

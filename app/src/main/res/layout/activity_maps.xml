@@ -13,15 +13,24 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="523dp"
-        tools:context=".MapsActivity">
-    </fragment>
+        tools:context=".MapsActivity"></fragment>
 
     <Button
         android:enabled="true"
-        android:id="@+id/btn_delete_marker"
+        android:id="@+id/btn_save_marker"
         android:layout_width="match_parent"
         android:layout_marginRight="12dp"
         android:layout_marginLeft="12dp"
         android:layout_height="wrap_content"
-        android:text="@string/delete_marker_n2" />
+        android:text="@string/save_markers" />
+
+    <Button
+        android:enabled="true"
+        android:id="@+id/btn_load_marker"
+        android:layout_width="match_parent"
+        android:layout_marginRight="12dp"
+        android:layout_marginLeft="12dp"
+        android:layout_height="wrap_content"
+        android:text="@string/load_markers" />
+
 </LinearLayout>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1003725121926",
+    "project_id": "mongogo-1577357462324",
+    "storage_bucket": "mongogo-1577357462324.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1003725121926:android:82f21dcbfcb8b7d6f96407",
+        "android_client_info": {
+          "package_name": "com.borja.mongogo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1003725121926-9ig3ttu6i9uge5tqpfvf1d7cja5bm6b5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2AyJ6H7Uan8o_i6JlNxoOucT9uYJIAHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1003725121926-9ig3ttu6i9uge5tqpfvf1d7cja5bm6b5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
