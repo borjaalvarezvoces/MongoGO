@@ -164,7 +164,6 @@ private lateinit var markerTxtId: TextView
         recycler.adapter = PhotoAdapter(listArrayImageView)
 
     }
-
     private fun delPhotosConfirmation() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Atención!")
@@ -188,5 +187,3 @@ private lateinit var markerTxtId: TextView
 
     }
     */
-
-}
