@@ -168,7 +168,6 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     }
   
-  multiImagen
     private fun delPhotosConfirmation() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Atención!")
