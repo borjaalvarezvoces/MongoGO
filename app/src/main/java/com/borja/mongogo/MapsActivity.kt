@@ -37,7 +37,6 @@ class MapsActivity : AppCompatActivity(),
 
     private var lastKnownLocation: Location? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-
     private val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1000
     val permissions = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
@@ -160,7 +159,8 @@ class MapsActivity : AppCompatActivity(),
                     "id" to pointMarker.id,
                     "title" to pointMarker.title,
                     "latitude" to pointMarker.position.latitude,
-                    "longitude" to pointMarker.position.longitude
+                    "longitude" to pointMarker.position.longitude,
+                    "description" to ""
                 )
             )
         }
@@ -196,16 +196,20 @@ class MapsActivity : AppCompatActivity(),
                 )
             }
         }
-
     }
 
-    override fun onInfoWindowLongClick(marker: Marker?) {
-        println(marker?.id)
+    override fun onInfoWindowLongClick(marker: Marker) {
+        println(marker.id)
+        println(marker.position)
         println("estamos en onInfoWindowLongClick por debajo del id de marker")
 
-        val markerId = marker?.id
+        val markerId = marker.id
+        val markerLat = marker.position.latitude
+        val markerLng = marker.position.longitude
         val intentMarker = Intent(this, DetailsActivity::class.java)
         intentMarker.putExtra("Id", markerId)
+        intentMarker.putExtra("Lat", markerLat)
+        intentMarker.putExtra("Lng", markerLng)
         startActivity(intentMarker)
     }
 

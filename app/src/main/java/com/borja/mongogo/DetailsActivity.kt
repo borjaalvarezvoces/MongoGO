@@ -10,17 +10,18 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.firestore.SetOptions
 import kotlinx.android.synthetic.main.activity_details.*
 import java.io.Serializable
 import java.text.DateFormat
@@ -30,10 +31,13 @@ import java.util.*
 class DetailsActivity : AppCompatActivity(), Serializable {
 
     private val db = FirebaseFirestore.getInstance()
-//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-private lateinit var markerTxtId: TextView
+
+    //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    private lateinit var markerTxtId: TextView
     private lateinit var markerTxtLtLng: TextView
     private lateinit var dateToTxt: TextView
+    private lateinit var descriptionTxt: TextView
+
 
     val permissions = arrayOf(
         android.Manifest.permission.CAMERA,
@@ -46,6 +50,9 @@ private lateinit var markerTxtId: TextView
     var image_uri: Uri? = null
 
 
+    private var pointMarker = ""
+    private var pruebaString = "abcd"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
@@ -53,11 +60,16 @@ private lateinit var markerTxtId: TextView
         dateForMarker()
         markerTxtLtLng = findViewById(R.id.markerTxtLtLng)
         markerTxtId = findViewById(R.id.streetDetailTxt)
-        val markerIdDetail = intent.getSerializableExtra("Id")
 
-        markerTxtId.text = markerIdDetail.toString()
-        println("markereeeeeeeeeeee $markerIdDetail")
-        println("markereeeeeeeeeeee $markerTxtId")
+        val markerLatDetail = intent.getSerializableExtra("Lat")
+        val markerLngDetail = intent.getSerializableExtra("Lng")
+        pointMarker = intent?.getStringExtra("Id").toString()
+
+        markerTxtId.text = pointMarker
+        markerTxtLtLng.text = markerLatDetail.toString() + markerLngDetail.toString()
+
+        println("markereeeeeeeeeeee   3   $pointMarker")
+
 
         button_capture.setOnClickListener {
             takePhoto()
@@ -66,8 +78,10 @@ private lateinit var markerTxtId: TextView
             delPhotosConfirmation()
         }
         buttonSave_id.setOnClickListener {
-            //  guardarMarkerDetail()
+            guardarMarkerInfo()
         }
+
+        updateMarkersDB()
 
     }
 
@@ -182,11 +196,27 @@ private lateinit var markerTxtId: TextView
         button_del_photos.visibility = View.GONE
     }
 
-    /*
-    private fun guardarMarkerDetail(){
-        db.collection("descripcionPrueba").document()
+
+    private fun guardarMarkerInfo() {
+        pruebaString = descriptionDetailTxt_id.getText().toString()
+        db.collection("markersGeo").document(pointMarker).set(
+            hashMapOf("description" to pruebaString),
+            SetOptions.merge()
+        )
 
     }
-    */
+
+
+    private fun updateMarkersDB() {
+        descriptionTxt = findViewById(R.id.descriptionDetailTxt_id)
+        Toast.makeText(this, "Boton pulsado", Toast.LENGTH_SHORT).show()
+        db.collection("markersGeo").document(pointMarker).get().addOnSuccessListener { document ->
+            if (document != null) {
+                descriptionTxt.setText(document.get("description") as String)
+            } else {
+                Log.d("Fail", "No such document")
+            }
+        }
+    }
 
 }

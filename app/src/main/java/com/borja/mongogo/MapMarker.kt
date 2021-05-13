@@ -8,7 +8,8 @@ data class MapMarker(
     val id: String,
     val title: String,
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
+    val description: String
 ) {
-    constructor() : this("", "", 0.0, 0.0)
+    constructor() : this("", "", 0.0, 0.0, "")
 }
