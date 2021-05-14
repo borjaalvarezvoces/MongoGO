@@ -5,6 +5,7 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -160,28 +161,13 @@ class MapsActivity : AppCompatActivity(),
                     "title" to pointMarker.title,
                     "latitude" to pointMarker.position.latitude,
                     "longitude" to pointMarker.position.longitude,
-                    "description" to ""
+                    "description" to "",
+                    "images" to listOf<String>("")
                 )
             )
+            onInfoWindowLongClick(pointMarker)
         }
     }
-
-    /*   private fun saveMarkerButton() {
-           btn_save_marker.setOnClickListener {
-               Toast.makeText(this, "Boton pulsado", Toast.LENGTH_SHORT).show()
-
-               for (i in arrayOfMarkers.indices) {
-                   db.collection("markersGeo").document(arrayOfMarkers[i].id).set(
-                       hashMapOf(
-                           "id" to arrayOfMarkers[i].id,
-                           "title" to arrayOfMarkers[i].title,
-                           "latitude" to arrayOfMarkers[i].position.latitude,
-                           "longitude" to arrayOfMarkers[i].position.longitude
-                       )
-                   )
-               }
-           }
-       }*/
 
     private fun updateMarkersDB() {
         db.collection("markersGeo").get().addOnSuccessListener {

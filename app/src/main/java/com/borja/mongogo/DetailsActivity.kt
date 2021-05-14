@@ -12,13 +12,11 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_details.*
 import java.io.Serializable
 import java.text.DateFormat
 import java.util.*
+import androidx.core.net.toUri as toUri1
 
 
 class DetailsActivity : AppCompatActivity(), Serializable {
@@ -40,19 +39,22 @@ class DetailsActivity : AppCompatActivity(), Serializable {
     private lateinit var descriptionTxt: TextView
 
 
-    val permissions = arrayOf(
+    var permissions = arrayOf(
         android.Manifest.permission.CAMERA,
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
     private val PERMISSIONS_REQUEST_ACCESS_CAMERA_AND_WSTORAGE = 1001
     private val IMAGE_CAPTURE_CODE = 1002
 
-    val arrayImageViews: MutableList<Uri> = mutableListOf()
+    var listUriImageViews: MutableList<Uri> = mutableListOf()
+    var listStringImageViewsFromDB: MutableList<String> = mutableListOf()
+    var listStringImageViews: MutableList<String?> = mutableListOf()
+    var listUriImageViewsFromDB: MutableList<Uri> = mutableListOf()
     var image_uri: Uri? = null
 
 
     private var pointMarker = ""
-    private var pruebaString = "abcd"
+    private var setDescriptionDB = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,10 +81,12 @@ class DetailsActivity : AppCompatActivity(), Serializable {
             delPhotosConfirmation()
         }
         buttonSave_id.setOnClickListener {
-            guardarMarkerInfo()
+            setMarkerDescriptionDB()
         }
-
-        updateMarkersDB()
+        buttonUpdate_id.setOnClickListener {
+            getMarkerImagesDB()
+        }
+        getMarkerDescriptionDB()
 
     }
 
@@ -157,7 +161,10 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         super.onActivityResult(requestCode, resultCode, data)
         //called when image was captured from camera intent
         if (resultCode == Activity.RESULT_OK) {
-            image_uri?.let { arrayImageViews.add(it) }
+            image_uri?.let { listUriImageViews.add(it) }
+            image_uri?.toString().let { listStringImageViews.add(it) }
+
+            setMarkerImagesDB()
             displayRecycleManager()
 
             button_del_photos.visibility = View.VISIBLE
@@ -173,10 +180,12 @@ class DetailsActivity : AppCompatActivity(), Serializable {
             false
         )
         recycler.layoutManager = layoutManager
-        for (i in arrayImageViews.indices) {
-            listArrayImageView.add(i, (Photo("Foto:${i + 1}", arrayImageViews[i])))
+        for (i in listUriImageViews.indices) {
+            listArrayImageView.add(i, (Photo("Foto:${i + 1}", listUriImageViews[i])))
+            Log.d("ArrayImages de Uris", listUriImageViews[i].toString())
         }
         recycler.adapter = PhotoAdapter(listArrayImageView)
+        Log.d("ArrayImages", listArrayImageView.toString())
 
     }
 
@@ -192,25 +201,22 @@ class DetailsActivity : AppCompatActivity(), Serializable {
     }
 
     private fun delPhotos() {
-        arrayImageViews.clear()
+        listUriImageViews.clear()
         displayRecycleManager()
         button_del_photos.visibility = View.GONE
     }
 
 
-    private fun guardarMarkerInfo() {
-        pruebaString = descriptionDetailTxt_id.getText().toString()
+    private fun setMarkerDescriptionDB() {
+        setDescriptionDB = descriptionDetailTxt_id.getText().toString()
         db.collection("markersGeo").document(pointMarker).set(
-            hashMapOf("description" to pruebaString),
+            hashMapOf("description" to setDescriptionDB),
             SetOptions.merge()
         )
-
     }
 
-
-    private fun updateMarkersDB() {
+    private fun getMarkerDescriptionDB() {
         descriptionTxt = findViewById(R.id.descriptionDetailTxt_id)
-        Toast.makeText(this, "Boton pulsado", Toast.LENGTH_SHORT).show()
         db.collection("markersGeo").document(pointMarker).get().addOnSuccessListener { document ->
             if (document != null) {
                 descriptionTxt.setText(document.get("description") as String)
@@ -218,5 +224,49 @@ class DetailsActivity : AppCompatActivity(), Serializable {
                 Log.d("Fail", "No such document")
             }
         }
+    }
+
+    private fun setMarkerImagesDB() {
+        println("listValueeeee $listStringImageViews")
+        db.collection("markersGeo").document(pointMarker).set(
+            hashMapOf("images" to listStringImageViews),
+            SetOptions.merge()
+        )
+    }
+
+    private fun getMarkerImagesDB() {
+        db.collection("markersGeo").document(pointMarker).get().addOnSuccessListener { document ->
+            if (document != null) {
+                listStringImageViewsFromDB = document.get("images") as MutableList<String>
+                println("print array 1 $listStringImageViewsFromDB")
+            } else {
+                Log.d("Fail", "No such document")
+            }
+        }
+        displayRecycleManagerDB()
+    }
+
+    private fun displayRecycleManagerDB() {
+        println("print array 2 $listStringImageViewsFromDB")
+        for (i in listStringImageViewsFromDB.indices) {
+            val aux = Uri.parse(listStringImageViewsFromDB[i])
+            listUriImageViewsFromDB.add(aux)
+        }
+
+        val listArrayImageView: MutableList<Photo> = mutableListOf()
+        val recycler = findViewById<RecyclerView>(R.id.recycler_id)
+        val layoutManager = LinearLayoutManager(
+            this,
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
+        recycler.layoutManager = layoutManager
+        for (i in listUriImageViewsFromDB.indices) {
+            listArrayImageView.add(i, (Photo("Foto:${i + 1}", listUriImageViewsFromDB[i])))
+            Log.d("ArrayImages de Uris", listUriImageViewsFromDB[i].toString())
+        }
+        recycler.adapter = PhotoAdapter(listArrayImageView)
+        Log.d("ArrayImages", listArrayImageView.toString())
+
     }
 }
