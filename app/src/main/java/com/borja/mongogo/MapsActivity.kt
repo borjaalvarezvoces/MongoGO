@@ -4,13 +4,15 @@ package com.borja.mongogo
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -19,9 +21,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.*
 
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
@@ -62,13 +63,8 @@ class MapsActivity : AppCompatActivity(),
 
     override fun onMapReady(map: GoogleMap) {
         this.map = map
-
-        // Get the current location of the device and set the position of the map.
         getDeviceLocation()
-
         setMapLongClick(map)
-        //  saveMarkerButton()
-        // map.setOnInfoWindowClickListener(this)
         map.setOnInfoWindowLongClickListener(this)
         map.setOnMarkerClickListener(this)
     }
@@ -126,7 +122,6 @@ class MapsActivity : AppCompatActivity(),
     ) {
         if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // comentario para probar a subirlo a la nueva rama "multiImage"
                 getUserLocation()
             } else {
                 Toast.makeText(this, "Permission was not granted", Toast.LENGTH_SHORT).show()
@@ -150,19 +145,27 @@ class MapsActivity : AppCompatActivity(),
                     .title(getString(R.string.marker_title))
                 //.snippet()
             )
-            pointMarker.title = pointMarker.id
-            pointMarker.tag = 0
+
             map.animateCamera(CameraUpdateFactory.newLatLng(pointMarker.position))
-            //  arrayOfMarkers.add(pointMarker)
+            val listaAdresses: MutableList<Address>?
+            val geocoder = Geocoder(this, Locale.getDefault())
+            listaAdresses = geocoder.getFromLocation(
+                pointMarker.position.latitude,
+                pointMarker.position.longitude,
+                1
+            )
+            val address = listaAdresses?.get(0)?.getAddressLine(0)
+            pointMarker.title = address
+            pointMarker.tag = pointMarker.id
 
             db.collection("markersGeo").document(pointMarker.id).set(
                 hashMapOf(
                     "id" to pointMarker.id,
-                    "title" to pointMarker.title,
+                    "title" to address,
                     "latitude" to pointMarker.position.latitude,
                     "longitude" to pointMarker.position.longitude,
                     "description" to "",
-                    "images" to listOf<String>("")
+                    "images" to listOf("")
                 )
             )
             onInfoWindowLongClick(pointMarker)
@@ -172,30 +175,25 @@ class MapsActivity : AppCompatActivity(),
     private fun updateMarkersDB() {
         db.collection("markersGeo").get().addOnSuccessListener {
             for (marker in it) {
-                var markerPoint = marker.toObject(MapMarker::class.java)
-                Log.i("nosgyutyurytte", markerPoint.toString())
+                val markerPoint = marker.toObject(MapMarker::class.java)
                 map?.addMarker(
                     MarkerOptions()
-                        .title(markerPoint.id)
+                        .title(markerPoint.title)
                         .position(LatLng(markerPoint.latitude, markerPoint.longitude))
-
-                )
+                )!!.tag = markerPoint.id
             }
         }
     }
 
     override fun onInfoWindowLongClick(marker: Marker) {
-        println(marker.id)
-        println(marker.position)
-        println("estamos en onInfoWindowLongClick por debajo del id de marker")
+        println("dentroOnInfo ${marker.id}")
 
-        val markerId = marker.id
-        val markerLat = marker.position.latitude
-        val markerLng = marker.position.longitude
+        val markerId = marker.tag!!.toString()
+        val markerAddress = marker.title
+
         val intentMarker = Intent(this, DetailsActivity::class.java)
         intentMarker.putExtra("Id", markerId)
-        intentMarker.putExtra("Lat", markerLat)
-        intentMarker.putExtra("Lng", markerLng)
+        intentMarker.putExtra("Address", markerAddress)
         startActivity(intentMarker)
     }
 

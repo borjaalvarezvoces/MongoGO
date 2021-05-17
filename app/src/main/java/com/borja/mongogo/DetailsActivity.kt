@@ -25,7 +25,6 @@ import kotlinx.android.synthetic.main.activity_details.*
 import java.io.Serializable
 import java.text.DateFormat
 import java.util.*
-import androidx.core.net.toUri as toUri1
 
 
 class DetailsActivity : AppCompatActivity(), Serializable {
@@ -34,7 +33,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     private lateinit var markerTxtId: TextView
-    private lateinit var markerTxtLtLng: TextView
+    private lateinit var markerTxtAdress: TextView
     private lateinit var dateToTxt: TextView
     private lateinit var descriptionTxt: TextView
 
@@ -53,7 +52,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
     var image_uri: Uri? = null
 
 
-    private var pointMarker = ""
+    private var markerID = ""
     private var setDescriptionDB = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,17 +60,16 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         setContentView(R.layout.activity_details)
 
         dateForMarker()
-        markerTxtLtLng = findViewById(R.id.markerTxtLtLng)
+        markerTxtAdress = findViewById(R.id.markerTxtAdress)
         markerTxtId = findViewById(R.id.streetDetailTxt)
 
-        val markerLatDetail = intent.getSerializableExtra("Lat")
-        val markerLngDetail = intent.getSerializableExtra("Lng")
-        pointMarker = intent?.getStringExtra("Id").toString()
+        val address = intent.getSerializableExtra("Address")
+        markerID = intent?.getStringExtra("Id").toString()
 
-        markerTxtId.text = pointMarker
-        markerTxtLtLng.text = markerLatDetail.toString() + markerLngDetail.toString()
+        markerTxtId.text = markerID
+        markerTxtAdress.text = address.toString()
 
-        println("markereeeeeeeeeeee   3   $pointMarker")
+        println("markereeeeeeeeeeee   3   $markerID")
 
 
         button_capture.setOnClickListener {
@@ -83,11 +81,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         buttonSave_id.setOnClickListener {
             setMarkerDescriptionDB()
         }
-        buttonUpdate_id.setOnClickListener {
-            getMarkerImagesDB()
-        }
-        getMarkerDescriptionDB()
-
+        fillMarkerInfoFromDB(markerID)
     }
 
     private fun dateForMarker() {
@@ -206,20 +200,23 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         button_del_photos.visibility = View.GONE
     }
 
-
     private fun setMarkerDescriptionDB() {
-        setDescriptionDB = descriptionDetailTxt_id.getText().toString()
-        db.collection("markersGeo").document(pointMarker).set(
+        setDescriptionDB = descriptionDetailTxt_id.text.toString()
+        db.collection("markersGeo").document(markerID).set(
             hashMapOf("description" to setDescriptionDB),
             SetOptions.merge()
         )
     }
 
-    private fun getMarkerDescriptionDB() {
+    private fun fillMarkerInfoFromDB(id: String) {
         descriptionTxt = findViewById(R.id.descriptionDetailTxt_id)
-        db.collection("markersGeo").document(pointMarker).get().addOnSuccessListener { document ->
+        db.collection("markersGeo").document(id).get().addOnSuccessListener { document ->
             if (document != null) {
-                descriptionTxt.setText(document.get("description") as String)
+                descriptionTxt.text = document.get("description") as String
+                listStringImageViewsFromDB = document.get("images") as MutableList<String>
+                println("print array 1 $listStringImageViewsFromDB")
+                displayRecycleManagerDB()
+
             } else {
                 Log.d("Fail", "No such document")
             }
@@ -228,25 +225,14 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     private fun setMarkerImagesDB() {
         println("listValueeeee $listStringImageViews")
-        db.collection("markersGeo").document(pointMarker).set(
+        db.collection("markersGeo").document(markerID).set(
             hashMapOf("images" to listStringImageViews),
             SetOptions.merge()
         )
     }
 
-    private fun getMarkerImagesDB() {
-        db.collection("markersGeo").document(pointMarker).get().addOnSuccessListener { document ->
-            if (document != null) {
-                listStringImageViewsFromDB = document.get("images") as MutableList<String>
-                println("print array 1 $listStringImageViewsFromDB")
-            } else {
-                Log.d("Fail", "No such document")
-            }
-        }
-        displayRecycleManagerDB()
-    }
-
     private fun displayRecycleManagerDB() {
+        println("estamos dentro de displaceDB")
         println("print array 2 $listStringImageViewsFromDB")
         for (i in listStringImageViewsFromDB.indices) {
             val aux = Uri.parse(listStringImageViewsFromDB[i])
