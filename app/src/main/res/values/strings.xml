@@ -7,6 +7,7 @@
     <string name="dateDetail">Fecha</string>
     <string name="streetDetail">Calle</string>
     <string name="descriptionDetail">Descripcion</string>
+    <string name="descriptionDetailEditTxt">Añadir Descripcion</string>
 
     <string name="large_text">
         "Material is the metaphor.\n\n"

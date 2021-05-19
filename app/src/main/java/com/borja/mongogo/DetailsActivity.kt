@@ -33,7 +33,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     private lateinit var markerTxtId: TextView
-    private lateinit var markerTxtAdress: TextView
+    private lateinit var markerTxtAddress: TextView
     private lateinit var dateToTxt: TextView
     private lateinit var descriptionTxt: TextView
 
@@ -60,37 +60,40 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         setContentView(R.layout.activity_details)
 
         dateForMarker()
-        markerTxtAdress = findViewById(R.id.markerTxtAdress)
-        markerTxtId = findViewById(R.id.streetDetailTxt)
+        markerTxtAddress = findViewById(R.id.addressDtailTxt_id)
+        markerTxtId = findViewById(R.id.markerIdDetailTxt_id)
 
         val address = intent.getSerializableExtra("Address")
         markerID = intent?.getStringExtra("Id").toString()
 
         markerTxtId.text = markerID
-        markerTxtAdress.text = address.toString()
+        markerTxtAddress.text = address.toString()
 
-        println("markereeeeeeeeeeee   3   $markerID")
-
-
-        button_capture.setOnClickListener {
+        button_capture_id.setOnClickListener {
             takePhoto()
         }
-        button_del_photos.setOnClickListener {
+        button_del_photos_id.setOnClickListener {
             delPhotosConfirmation()
         }
         buttonSave_id.setOnClickListener {
-            setMarkerDescriptionDB()
+            saveMarkerInfoConfirmation()
         }
         fillMarkerInfoFromDB(markerID)
     }
 
+    /*
+        Obtiene la fecha actual y cubre dateDetailTxt_id con ella
+     */
     private fun dateForMarker() {
         val calendar = Calendar.getInstance()
         val currentDate = DateFormat.getDateInstance().format(calendar.getTime())
-        dateToTxt = findViewById(R.id.dateDetailTxt)
+        dateToTxt = findViewById(R.id.dateDetailTxt_id)
         dateToTxt.text = currentDate
     }
 
+    /*
+        Comprueba si el usuario ha aceptado permisos de uso de camara antes de abrirla, si no, los solicita
+     */
     private fun takePhoto() {
         if (hasNoPermissions()) {
             requestPermission()
@@ -99,6 +102,11 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         }
     }
 
+    /*
+        Comprueba que la version del SDK de android es superior a "marshmallow" para solicitar UserPermisions en tiempo de ejecucion
+        proporciona permisos de Camara y Write_External_Storage
+        @return true
+     */
     private fun hasNoPermissions(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             return ContextCompat.checkSelfPermission(
@@ -114,6 +122,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         }
     }
 
+
     private fun requestPermission() {
         ActivityCompat.requestPermissions(
             this,
@@ -122,6 +131,10 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         )
     }
 
+    /*
+        Comprueba con la variable que guarda los permisos si estos han sido garantizados
+        @param requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -138,6 +151,10 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         }
     }
 
+    /*
+        Abre la camara y genera un archivo "image_ui" que guardará en nuestro dispositivo la informacion de la foto que saquemos
+        llama a startActivityForResult con el intent de la camara y la informacion proporcionada para guardar la foto
+     */
     private fun openCamera() {
         val values = ContentValues()
         values.put(MediaStore.Images.Media.TITLE, "New Picture B")
@@ -151,6 +168,11 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
     }
 
+    /*
+        Una vez la fotografia es capturada y aceptada se guarda en un List "listUriImageViews" que posteriormente
+        se mostrará en la ventana de detalle, en otro "listStringImageViews" que se utilizará para almacenar las imagenes en la DB
+        @param requestCode: Int, resultCode: Int, data: Intent?
+     */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         //called when image was captured from camera intent
@@ -161,10 +183,16 @@ class DetailsActivity : AppCompatActivity(), Serializable {
             setMarkerImagesDB()
             displayRecycleManager()
 
-            button_del_photos.visibility = View.VISIBLE
+            button_del_photos_id.visibility = View.VISIBLE
         }
     }
 
+    /*
+        Pasa al RecycleManager la informacion necesaria para que gestione el listado de fotos aceptadas por el usuario y a continuacion las muestre
+        Crea por cada una de las Uris en el lisado una nueva "Photo" pasandole a esta clase un titulo "Foto: i" y una Uri concreta que extrae recursivamente del listado
+        que el Adapter a continuacion utilizará como cover, para pintar el detalle completo de cada una de las imagenes.
+        Establece las caracteristicas del LinearLayoutManager y pasa al PhotoAdapter del recycler el listado necesario para pintar las imagenes
+     */
     private fun displayRecycleManager() {
         val listArrayImageView: MutableList<Photo> = mutableListOf()
         val recycler = findViewById<RecyclerView>(R.id.recycler_id)
@@ -176,17 +204,17 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         recycler.layoutManager = layoutManager
         for (i in listUriImageViews.indices) {
             listArrayImageView.add(i, (Photo("Foto:${i + 1}", listUriImageViews[i])))
-            Log.d("ArrayImages de Uris", listUriImageViews[i].toString())
         }
         recycler.adapter = PhotoAdapter(listArrayImageView)
-        Log.d("ArrayImages", listArrayImageView.toString())
-
     }
 
+    /*
+        Crea y muestra un AlertDialog para obtener confirmacion o cancelacion por parte del usuario antes de borrar todas las imagenes que se muestran actualmente
+     */
     private fun delPhotosConfirmation() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Atención!")
-        builder.setMessage("Estás seguro de querer borrar todas las fotos?")
+        builder.setMessage("Estás seguro de querer borrar todas las fotos")
         builder.setPositiveButton("Si") { dialogInterface: DialogInterface, i: Int ->
             delPhotos()
         }
@@ -194,12 +222,36 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         builder.show()
     }
 
+    /*
+        Vacia de imagenes el listado para que el Recycler no tenga imagenes que mostrar,
+        Oculta la visibilidad del boton para que este no se muestre cuando no hay fotos.
+     */
     private fun delPhotos() {
         listUriImageViews.clear()
         displayRecycleManager()
-        button_del_photos.visibility = View.GONE
+        button_del_photos_id.visibility = View.GONE
     }
 
+    /*
+        Crea un AlertDialog para informar al usuario que la informacion indicada para este marcador será guardada si acepta la confirmacion
+        de ser así cierra la ventana de Detalle y regresa al mapa.
+     */
+    private fun saveMarkerInfoConfirmation() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Guardar")
+        builder.setMessage("Estás seguro de querer guardar este marcador?")
+        builder.setPositiveButton("Si") { dialogInterface: DialogInterface, i: Int ->
+            setMarkerDescriptionDB()
+            finish()
+        }
+        builder.setNegativeButton("No") { dialogInterface: DialogInterface, i: Int -> }
+        builder.show()
+    }
+
+    /*
+        Instancia la base de datos para actualizar la informacion del marcador añadiendo el contenido de la descripcion
+        que el usuario escribe en su correspondiente campo "descriptionDetailTxt_id"
+     */
     private fun setMarkerDescriptionDB() {
         setDescriptionDB = descriptionDetailTxt_id.text.toString()
         db.collection("markersGeo").document(markerID).set(
@@ -208,32 +260,40 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         )
     }
 
+    /*
+        Instancia la base de datos para obtener para un determinado marcador, la informacion correspondiente a la descripcion de este
+        así cómo el listado de Strings que corresponden a las Uris utilizadas para mostrar cada una de las imagenes
+        A continuacion llama a displayRecycleManagerDB() para que pinte las imagenes provinientes de la DB al abrir el marcador.
+        @param id del marcador correspondiente como un String
+     */
     private fun fillMarkerInfoFromDB(id: String) {
         descriptionTxt = findViewById(R.id.descriptionDetailTxt_id)
         db.collection("markersGeo").document(id).get().addOnSuccessListener { document ->
             if (document != null) {
                 descriptionTxt.text = document.get("description") as String
                 listStringImageViewsFromDB = document.get("images") as MutableList<String>
-                println("print array 1 $listStringImageViewsFromDB")
                 displayRecycleManagerDB()
-
             } else {
                 Log.d("Fail", "No such document")
             }
         }
     }
 
+    /*
+        Instancia la base de datos para actualizar el contenido de las imagenes guardadas en ella.
+     */
     private fun setMarkerImagesDB() {
-        println("listValueeeee $listStringImageViews")
         db.collection("markersGeo").document(markerID).set(
             hashMapOf("images" to listStringImageViews),
             SetOptions.merge()
         )
     }
 
+    /*
+        Funciona como el anterior RecyclerManager per en esta ocasion con el listado de imagenes provinientes de la DB
+        con el fin de que estas se muestren automaticamente al abrir el detail de este marcador en concreto.
+     */
     private fun displayRecycleManagerDB() {
-        println("estamos dentro de displaceDB")
-        println("print array 2 $listStringImageViewsFromDB")
         for (i in listStringImageViewsFromDB.indices) {
             val aux = Uri.parse(listStringImageViewsFromDB[i])
             listUriImageViewsFromDB.add(aux)
@@ -249,10 +309,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         recycler.layoutManager = layoutManager
         for (i in listUriImageViewsFromDB.indices) {
             listArrayImageView.add(i, (Photo("Foto:${i + 1}", listUriImageViewsFromDB[i])))
-            Log.d("ArrayImages de Uris", listUriImageViewsFromDB[i].toString())
         }
         recycler.adapter = PhotoAdapter(listArrayImageView)
-        Log.d("ArrayImages", listArrayImageView.toString())
-
     }
 }
