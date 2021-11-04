@@ -2,16 +2,20 @@ package com.borja.mongogo
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.DownloadManager
 import android.content.ContentValues
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.webkit.URLUtil
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +25,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.ktx.storage
 import kotlinx.android.synthetic.main.activity_details.*
 import java.io.Serializable
 import java.text.DateFormat
@@ -30,8 +37,6 @@ import java.util.*
 class DetailsActivity : AppCompatActivity(), Serializable {
 
     private val db = FirebaseFirestore.getInstance()
-
-    //aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
     private lateinit var markerTxtId: TextView
     private lateinit var markerTxtAddress: TextView
     private lateinit var dateToTxt: TextView
@@ -51,15 +56,18 @@ class DetailsActivity : AppCompatActivity(), Serializable {
     var listUriImageViewsFromDB: MutableList<Uri> = mutableListOf()
     var image_uri: Uri? = null
 
+    lateinit var storage: FirebaseStorage
 
     private var markerID = ""
     private var setDescriptionDB = ""
+    private var setDateDB = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
 
-        dateForMarker()
+        storage = Firebase.storage
+
         markerTxtAddress = findViewById(R.id.addressDtailTxt_id)
         markerTxtId = findViewById(R.id.markerIdDetailTxt_id)
 
@@ -79,6 +87,36 @@ class DetailsActivity : AppCompatActivity(), Serializable {
             saveMarkerInfoConfirmation()
         }
         fillMarkerInfoFromDB(markerID)
+
+
+        buttonPdf_id.setOnClickListener {
+            openPdfConfirmation()
+
+        }
+    }
+
+
+    private fun openPdfConfirmation() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Descarga!")
+        builder.setMessage("Descarga documento general")
+        builder.setPositiveButton("Si") { dialogInterface: DialogInterface, i: Int ->
+            openPdf()
+        }
+        builder.setNegativeButton("No") { dialogInterface: DialogInterface, i: Int -> }
+        builder.show()
+    }
+
+    private fun openPdf() {
+        val url =
+            "https://firebasestorage.googleapis.com/v0/b/mongogo-1577357462324.appspot.com/o/solicitude.pdf?alt=media&token=6bdff740-943a-4a64-94a6-97bb5ef9840d"
+        val title = URLUtil.guessFileName(url, null, null)
+        val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val request = DownloadManager.Request(Uri.parse(url))
+        request.setTitle(title)
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, title)
+        manager.enqueue(request)
     }
 
     /*
@@ -89,6 +127,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         val currentDate = DateFormat.getDateInstance().format(calendar.getTime())
         dateToTxt = findViewById(R.id.dateDetailTxt_id)
         dateToTxt.text = currentDate
+        println(currentDate)
     }
 
     /*
@@ -182,8 +221,10 @@ class DetailsActivity : AppCompatActivity(), Serializable {
 
             setMarkerImagesDB()
             displayRecycleManager()
+            dateForMarker()
 
             button_del_photos_id.visibility = View.VISIBLE
+            buttonPdf_id.visibility = View.VISIBLE
         }
     }
 
@@ -242,6 +283,7 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         builder.setMessage("Estás seguro de querer guardar este marcador?")
         builder.setPositiveButton("Si") { dialogInterface: DialogInterface, i: Int ->
             setMarkerDescriptionDB()
+            setMarkerDateDB()
             finish()
         }
         builder.setNegativeButton("No") { dialogInterface: DialogInterface, i: Int -> }
@@ -260,6 +302,14 @@ class DetailsActivity : AppCompatActivity(), Serializable {
         )
     }
 
+    private fun setMarkerDateDB() {
+        setDateDB = dateDetailTxt_id.text.toString()
+        db.collection("markersGeo").document(markerID).set(
+            hashMapOf("date" to setDateDB),
+            SetOptions.merge()
+        )
+    }
+
     /*
         Instancia la base de datos para obtener para un determinado marcador, la informacion correspondiente a la descripcion de este
         así cómo el listado de Strings que corresponden a las Uris utilizadas para mostrar cada una de las imagenes
@@ -268,9 +318,11 @@ class DetailsActivity : AppCompatActivity(), Serializable {
      */
     private fun fillMarkerInfoFromDB(id: String) {
         descriptionTxt = findViewById(R.id.descriptionDetailTxt_id)
+        dateToTxt = findViewById(R.id.dateDetailTxt_id)
         db.collection("markersGeo").document(id).get().addOnSuccessListener { document ->
             if (document != null) {
                 descriptionTxt.text = document.get("description") as String
+                dateToTxt.text = document.get("date") as String
                 listStringImageViewsFromDB = document.get("images") as MutableList<String>
                 displayRecycleManagerDB()
             } else {

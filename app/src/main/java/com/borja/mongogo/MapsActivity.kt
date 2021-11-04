@@ -198,6 +198,7 @@ class MapsActivity : AppCompatActivity(),
                     "latitude" to pointMarker.position.latitude,
                     "longitude" to pointMarker.position.longitude,
                     "description" to "",
+                    "date" to "",
                     "images" to listOf("")
                 )
             )
@@ -210,6 +211,7 @@ class MapsActivity : AppCompatActivity(),
         utilizando su posicion y titulo, ligando los nuevos marcadores a los creados inicialmente a traves de su propiedad "tag"
      */
     private fun updateMarkersDB() {
+        println("diosmiodemividaseñormio2222222")
         db.collection("markersGeo").get().addOnSuccessListener {
             for (marker in it) {
                 val markerPoint = marker.toObject(MapMarker::class.java)
@@ -236,21 +238,24 @@ class MapsActivity : AppCompatActivity(),
         intentMarker.putExtra("Id", markerId)
         intentMarker.putExtra("Address", markerAddress)
         startActivity(intentMarker)
+        //forResultpppppppppppppppppppppppppppppppppppppppppppppp
+        // guardar serializacion en binarion del pdf.
     }
 
     override fun onMarkerClick(marker: Marker?): Boolean {
 
-/*        Log.i("lalalalalala 30001", marker.toString())
+        Log.i("lalalalalala 30001", marker.toString())
         val markerId = marker?.tag!!.toString()
         val markerAddress = marker.title
         Toast.makeText(this, "Marcador $markerId pulsado", Toast.LENGTH_SHORT).show()
         button_del_marker_id.visibility = View.VISIBLE
-        deleteMarker(marker, markerId, markerAddress)*/
+        deleteMarker(marker, markerId, markerAddress)
 
         return false
 
     }
-/*    private fun deleteMarker(marker: Marker, markerId: String, markerTitle: String) {
+
+    private fun deleteMarker(marker: Marker, markerId: String, markerTitle: String) {
         Log.i("lalalalalala 30002", marker.toString())
         button_del_marker_id.setOnClickListener {
             Log.i("lalalalalala 30002 botonpu", marker.toString())
@@ -268,7 +273,7 @@ class MapsActivity : AppCompatActivity(),
             builder.show()
         }
 
-    }*/
+    }
 
 }
 
