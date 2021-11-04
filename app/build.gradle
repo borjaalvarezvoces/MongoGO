@@ -15,6 +15,9 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
+        manifestPlaceholders = [pdftronLicenseKey:PDFTRON_LICENSE_KEY]
     }
 
     buildTypes {
@@ -44,5 +47,13 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:27.1.0')
     implementation 'com.google.firebase:firebase-firestore:22.1.2'
     implementation 'com.google.firebase:firebase-analytics-ktx'
+
+    implementation "com.pdftron:pdftron:9.0.2"
+    implementation "com.pdftron:tools:9.0.2"
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    implementation 'com.firebaseui:firebase-ui-storage:8.0.0'
+    implementation "com.google.firebase:firebase-storage-ktx:20.0.0"
+    implementation "com.github.barteksc:android-pdf-viewer:2.8.2"
 
 }
